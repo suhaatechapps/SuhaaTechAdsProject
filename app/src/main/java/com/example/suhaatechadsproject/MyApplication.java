@@ -18,7 +18,7 @@ public class MyApplication extends Application {
         if (TrueConstants.INSTANCE.isNetworkAvailable(TrueAdManager.context) &&
                 TrueConstants.INSTANCE.isNetworkSpeedHigh()) {
             TrueAntiAdLimit.getInstance()
-                    .init(this, "https://suhaatech.com/AdsId/testads.json");
+                    .init(this, "https://suhaatech.com/AdsId/charging_animation_final_hkdsjsdhjgkdhsgjksdh.json");
         }
     }
 }
