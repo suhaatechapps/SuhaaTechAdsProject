@@ -1,4 +1,6 @@
 # SuhaaTechAdsProject
+
+Note:This Library Is only used for Suhaa Tech Projects.
 Works with Admob.
 Added ad types are NativeBanner, NativeAdvanced, Interstitial and Banner Ads for Admob.
 Ui Always stays stable, no displacement.
