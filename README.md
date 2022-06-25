@@ -1,6 +1,7 @@
 # SuhaaTechAdsProject
 
 Note:This Library Is only used for Suhaa Tech Projects.
+
 Works with Admob.
 Added ad types are NativeBanner, NativeAdvanced, Interstitial and Banner Ads for Admob.
 Ui Always stays stable, no displacement.
@@ -20,7 +21,7 @@ Step 1. Add the JitPack repository to your build file , Add it in your root buil
 Step 2. Add the dependency
 
 	dependencies {
-	       implementation 'com.github.suhaatechapps:SuhaaTechAdsProject:9.1.2.3'
+	       implementation 'com.github.suhaatechapps:SuhaaTechAdsProject:9.1.2.4'
 	}
 	
 	
