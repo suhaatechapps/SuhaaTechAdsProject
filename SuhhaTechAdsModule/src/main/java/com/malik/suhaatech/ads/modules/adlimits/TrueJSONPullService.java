@@ -38,7 +38,7 @@ public class TrueJSONPullService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.d(TAG, "Start Pulling JSON data");
+        Log.d(TAG, "Start Pulling JSON data"+intent.getExtras());
         if (intent == null)
             return;
         String mUrl;
@@ -46,7 +46,7 @@ public class TrueJSONPullService extends IntentService {
         if (extras == null)
             return;
         mUrl = extras.getString("URL");
-
+        Log.d(TAG, "Url Is: "+mUrl);
         HttpURLConnection connection = null;
         BufferedReader reader = null;
 

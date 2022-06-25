@@ -241,12 +241,12 @@ class TrueAdMobManager(
                                             override fun onAdClicked() {
                                                 super.onAdClicked()
                                                 TruePrefUtils.getInstance()
-                                                    .init(context, prefNameInter)
+                                                    .init(context, prefNameInterInAdvance)
                                                     .zUpdateClicksCounter()
                                             }
 
                                         }
-                                    TruePrefUtils.getInstance().init(context, prefNameInter)
+                                    TruePrefUtils.getInstance().init(context, prefNameInterInAdvance)
                                         .zUpdateImpressionCounter()
                                     zInterCallbacksInAdvance?.zOnAddLoaded(zAdType = TrueAdsType.Z_ADMOB)
                                     zCallBackCalled = true
@@ -973,7 +973,6 @@ class TrueAdMobManager(
             }
         } else {
             zNativeAdvancedView.visibility = View.GONE
-            loadAdmobNativeInAdvance(context, nativeAdId)
         }
     }
 
@@ -1104,7 +1103,6 @@ class TrueAdMobManager(
             }
         } else {
             trueZNativeBannerSimpleView.visibility = View.GONE
-            loadAdmobFlippingNativeInAdvance(context, nativeAdId)
         }
     }
 
@@ -1234,7 +1232,6 @@ class TrueAdMobManager(
             }
         } else {
             trueZNativeBannerSimpleView.visibility = View.GONE
-            loadAdmobSimpleNativeInAdvance(context, nativeAdId)
         }
     }
 }
