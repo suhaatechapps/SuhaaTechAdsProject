@@ -73,8 +73,8 @@ afterEvaluate {
             release(MavenPublication) {
                 from(components["release"])
                 artifactId = "SuhhaTechAdsModule"
-                groupId = "com.github.TrueMuslimStudio"
-                version = "9.1.2.6"
+                groupId = "com.github.suhaatechapps"
+                version = "9.1.2.7"
             }
         }
     }
