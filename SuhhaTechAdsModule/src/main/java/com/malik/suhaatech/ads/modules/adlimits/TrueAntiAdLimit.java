@@ -39,7 +39,7 @@ public class TrueAntiAdLimit {
         /** Start Pulling json Data in the background*/
         Intent intent = new Intent(context, TrueJSONPullService.class);
         intent.putExtra("URL", JSONUrl);
-        context.startService(intent);
+        this.context.startService(intent);
 
         /** Display TEST Device Id*/
         new Thread(() -> {
