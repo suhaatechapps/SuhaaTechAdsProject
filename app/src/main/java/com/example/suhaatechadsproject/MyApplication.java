@@ -2,7 +2,7 @@ package com.example.suhaatechadsproject;
 
 import android.app.Application;
 
-import com.malik.suhaatech.ads.modules.TrueTrueAdManager;
+import com.malik.suhaatech.ads.modules.TrueAdManager;
 import com.malik.suhaatech.ads.modules.TrueConstants;
 import com.malik.suhaatech.ads.modules.adlimits.TrueAntiAdLimit;
 
@@ -13,9 +13,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        TrueTrueAdManager.INSTANCE.zInitializeAds(this);
+        TrueAdManager.INSTANCE.zInitializeAds(this);
         try {
-            if (TrueConstants.INSTANCE.isNetworkAvailable(TrueTrueAdManager.context) &&
+            if (TrueConstants.INSTANCE.isNetworkAvailable(TrueAdManager.context) &&
                     TrueConstants.INSTANCE.isNetworkSpeedHigh()) {
                 TrueAntiAdLimit.getInstance()
                         .init(this, "https://suhaatech.com/AdsId/testads.json");

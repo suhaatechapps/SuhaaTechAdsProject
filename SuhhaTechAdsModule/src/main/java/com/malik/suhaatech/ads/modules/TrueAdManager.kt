@@ -20,7 +20,7 @@ import com.malik.suhaatech.ads.modules.types.TrueAdsType
 import com.malik.suhaatech.ads.modules.types.TrueWhatAd
 
 @SuppressLint("StaticFieldLeak")
-object TrueTrueAdManager : TrueAdCallBackInterface {
+object TrueAdManager : TrueAdCallBackInterface {
 
     private var zAdMobManager: TrueAdMobManager? = null
     private var TAG = "AdManagerClass"

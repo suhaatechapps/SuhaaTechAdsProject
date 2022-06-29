@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources.NotFoundException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -16,7 +15,6 @@ import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -895,7 +893,7 @@ class TrueAdMobManager(
             WindowManager.LayoutParams.MATCH_PARENT
         )
         loadAdsLayoutBinding.tvMessage.text =
-            TrueTrueAdManager.context.resources.getString(R.string.loading_ad)
+            TrueAdManager.context.resources.getString(R.string.loading_ad)
     }
 
     /**Load And Show Native In Advance*/

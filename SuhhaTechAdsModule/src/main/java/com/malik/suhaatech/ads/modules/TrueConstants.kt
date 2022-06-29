@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.malik.suhaatech.ads.modules.TrueTrueAdManager.context
+import com.malik.suhaatech.ads.modules.TrueAdManager.context
 import java.lang.Exception
 
 

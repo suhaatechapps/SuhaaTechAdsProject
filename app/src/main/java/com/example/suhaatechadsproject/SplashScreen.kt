@@ -1,17 +1,15 @@
 package com.example.suhaatechadsproject
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.suhaatechadsproject.databinding.ActivitySplashScreenBinding
 import com.malik.suhaatech.ads.modules.TrueAdMobManager
 import com.malik.suhaatech.ads.modules.TrueConstants
-import com.malik.suhaatech.ads.modules.TrueTrueAdManager
+import com.malik.suhaatech.ads.modules.TrueAdManager
 import com.malik.suhaatech.ads.modules.database.TrueZSPRepository
 import com.malik.suhaatech.ads.modules.interfaces.TrueAdCallBackInterface
 
@@ -27,7 +25,7 @@ class SplashScreen : AppCompatActivity() {
 
             if (TrueConstants.isNetworkAvailable(this@SplashScreen) && TrueConstants.isNetworkSpeedHigh()) {
                 binding.splashProgress.visibility = View.GONE
-                TrueTrueAdManager.zShowInterstitial(
+                TrueAdManager.zShowInterstitial(
                     this,
                     "ca-app-pub-3940256099942544/1033173712",
                     object : TrueAdCallBackInterface {
@@ -59,12 +57,12 @@ class SplashScreen : AppCompatActivity() {
             }
         }, 4000)
 
-        TrueTrueAdManager.zLoadInterstitialInAdvance(
+        TrueAdManager.zLoadInterstitialInAdvance(
             this,
             "ca-app-pub-3940256099942544/1033173712"
         )
 
-        TrueTrueAdManager.zLoadSimpleNativeAdInAdvance(
+        TrueAdManager.zLoadSimpleNativeAdInAdvance(
             this,
             "ca-app-pub-3940256099942544/2247696110"
         )
