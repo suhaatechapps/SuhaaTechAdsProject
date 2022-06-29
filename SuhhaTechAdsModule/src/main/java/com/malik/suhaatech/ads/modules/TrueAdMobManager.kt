@@ -2,8 +2,10 @@ package com.malik.suhaatech.ads.modules
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources.NotFoundException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -14,33 +16,37 @@ import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.malik.suhaatech.ads.modules.adlimits.TrueAdLimitUtils
-import com.malik.suhaatech.ads.modules.adlimits.TruePrefUtils
+import android.widget.Toast
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.malik.suhaatech.ads.modules.TrueAdsCalBackObject.interstitialAdnValue
+import com.malik.suhaatech.ads.modules.adlimits.TrueAdLimitUtils
+import com.malik.suhaatech.ads.modules.adlimits.TruePrefUtils
 import com.malik.suhaatech.ads.modules.callbacks.TrueAdCallbacks
 import com.malik.suhaatech.ads.modules.callbacks.TrueInterCallbacks
 import com.malik.suhaatech.ads.modules.customadview.TrueZBannerView
 import com.malik.suhaatech.ads.modules.customadview.TrueZNativeAdvancedView
 import com.malik.suhaatech.ads.modules.customadview.TrueZNativeBannerFlippingView
 import com.malik.suhaatech.ads.modules.customadview.TrueZNativeBannerSimpleView
+import com.malik.suhaatech.ads.modules.database.TrueZSPRepository
 import com.malik.suhaatech.ads.modules.databinding.*
+import com.malik.suhaatech.ads.modules.interfaces.TrueAdCallBackInterface
 import com.malik.suhaatech.ads.modules.templates.TrueBannerTemplateStyle
+import com.malik.suhaatech.ads.modules.templates.TrueNativeTemplateStyle
 import com.malik.suhaatech.ads.modules.types.TrueAdsType
 import com.malik.suhaatech.ads.modules.types.TrueWhatAd
-import com.malik.suhaatech.ads.modules.templates.TrueNativeTemplateStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 class TrueAdMobManager(
     private val zContext: Context?
-) {
+) : Application() {
     var zInterstitialAd: InterstitialAd? = null
         private set
     private var zBannerAdView: AdView? = null
@@ -51,12 +57,18 @@ class TrueAdMobManager(
     private var prefNameNative: String? = null
     private var prefNameNativeBanner: String? = null
     private var prefNameFlippingNativeBanner: String? = null
-
+    private var interAdLoad = false
+    private var simpleNativeBooleanValue = false
+    private var floatingNativeBooleanValue = false
+    private var nativeAdvanceBooleanValue = false
+    private var dismissInterBooleanValue = false
     var TAG = "TrueAdMobClass"
     lateinit var dialog: Dialog
+    lateinit var trueAdCallBackInterface: TrueAdCallBackInterface
 
     @Suppress("DEPRECATION")
     companion object {
+
         var mShowInterstitialAds = false
         var zInterstitialAdInAdvance: InterstitialAd? = null
         var mAdmobNative: NativeAd? = null
@@ -66,6 +78,7 @@ class TrueAdMobManager(
         var admobNativeAdLoader: AdLoader? = null
         var mSimpleAdmobNativeAdLoader: AdLoader? = null
         var mFlippingAdmobNativeAdLoader: AdLoader? = null
+        lateinit var trueZNativeBannerSimpleView1: TrueZNativeBannerSimpleView
         private var zInterCallbacksInAdvance: TrueInterCallbacks? = null
 
         private var prefNameFlippingNativeInAdvanced: String? = null
@@ -80,12 +93,14 @@ class TrueAdMobManager(
             val scale = outMetrics.density
             return (dp * scale + 0.5f).toInt()
         }
+
     }
 
     @SuppressLint("BinaryOperationInTimber")
     fun zLoadInterstitialAd(
         context: Activity,
-        interId: String
+        interId: String,
+        trueAdCallBackInterface: TrueAdCallBackInterface
     ) {
         dialog = Dialog(context)
         loadAds(context)
@@ -100,6 +115,7 @@ class TrueAdMobManager(
                 val adRequest = AdRequest.Builder().build()
                 Handler(Looper.getMainLooper()).postDelayed(
                     {
+                        TrueZSPRepository.setAdAvailableValue(context, true)
                         InterstitialAd.load(
                             zContext!!,
                             interId,
@@ -108,18 +124,26 @@ class TrueAdMobManager(
                                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                                     dialog.dismiss()
                                     this@TrueAdMobManager.zInterstitialAd = interstitialAd
-
+                                    TrueZSPRepository.setAdAvailableValue(context, true)
                                     interstitialAd.fullScreenContentCallback =
                                         object : FullScreenContentCallback() {
                                             override fun onAdDismissedFullScreenContent() {
+                                                TrueZSPRepository.setAdAvailableValue(
+                                                    context,
+                                                    true
+                                                )
                                                 zInterCallbacks?.zOnAddDismissed(TrueAdsType.Z_ADMOB)
                                                 zCallBackCalled = true
+                                                trueAdCallBackInterface.onShowAdComplete()
                                             }
 
                                             override fun onAdFailedToShowFullScreenContent(
                                                 adError: AdError
                                             ) {
-
+                                                TrueZSPRepository.setAdAvailableValue(
+                                                    context,
+                                                    true
+                                                )
                                                 zInterCallbacks?.zOnAdFailedToShowFullContent(
                                                     zAdType = TrueAdsType.Z_ADMOB,
                                                     zError = TrueError(
@@ -135,6 +159,10 @@ class TrueAdMobManager(
                                                 zInterCallbacks?.zOnAddShowed(TrueAdsType.Z_ADMOB)
                                                 zCallBackCalled = true
                                                 zInterstitialAd = null
+                                                TrueZSPRepository.setAdAvailableValue(
+                                                    context,
+                                                    true
+                                                )
                                             }
 
                                             override fun onAdClicked() {
@@ -142,6 +170,10 @@ class TrueAdMobManager(
                                                 TruePrefUtils.getInstance()
                                                     .init(context, prefNameInter)
                                                     .zUpdateClicksCounter()
+                                                TrueZSPRepository.setAdAvailableValue(
+                                                    context,
+                                                    true
+                                                )
                                             }
 
                                         }
@@ -161,6 +193,7 @@ class TrueAdMobManager(
                                             zDomain = loadAdError.domain,
                                         )
                                     )
+                                    TrueZSPRepository.setAdAvailableValue(context, true)
                                     dialog.dismiss()
                                     zCallBackCalled = true
                                 }
@@ -173,6 +206,8 @@ class TrueAdMobManager(
                     TruePrefUtils.getInstance().init(context, prefNameInter).delayMs
                 )
             } else {
+                trueAdCallBackInterface.onShowAdComplete()
+                TrueZSPRepository.setAdAvailableValue(context, false)
                 Timber.tag("AdmobInter").d(
                     "Inter Ad Is Banned : " + !TrueAdLimitUtils.isBanned(
                         context,
@@ -206,19 +241,25 @@ class TrueAdMobManager(
                             object : InterstitialAdLoadCallback() {
                                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                                     zInterstitialAdInAdvance = interstitialAd
+
                                     interstitialAd.fullScreenContentCallback =
                                         object : FullScreenContentCallback() {
+
                                             override fun onAdDismissedFullScreenContent() {
+
                                                 zInterCallbacksInAdvance?.zOnAddDismissed(
                                                     TrueAdsType.Z_ADMOB
                                                 )
                                                 zCallBackCalled = true
                                                 TrueConstants.mShowInterstitialAds = false
+                                                interAdLoad = true
+                                                trueAdCallBackInterface.onShowAdComplete()
                                             }
 
                                             override fun onAdFailedToShowFullScreenContent(
                                                 adError: AdError
                                             ) {
+
                                                 TrueConstants.mShowInterstitialAds = true
                                                 zInterCallbacksInAdvance?.zOnAdFailedToShowFullContent(
                                                     zAdType = TrueAdsType.Z_ADMOB,
@@ -232,6 +273,7 @@ class TrueAdMobManager(
                                             }
 
                                             override fun onAdShowedFullScreenContent() {
+
                                                 zInterCallbacksInAdvance?.zOnAddShowed(TrueAdsType.Z_ADMOB)
                                                 zCallBackCalled = true
                                                 zInterstitialAdInAdvance = null
@@ -239,6 +281,7 @@ class TrueAdMobManager(
                                             }
 
                                             override fun onAdClicked() {
+
                                                 super.onAdClicked()
                                                 TruePrefUtils.getInstance()
                                                     .init(context, prefNameInterInAdvance)
@@ -246,13 +289,15 @@ class TrueAdMobManager(
                                             }
 
                                         }
-                                    TruePrefUtils.getInstance().init(context, prefNameInterInAdvance)
+                                    TruePrefUtils.getInstance()
+                                        .init(context, prefNameInterInAdvance)
                                         .zUpdateImpressionCounter()
                                     zInterCallbacksInAdvance?.zOnAddLoaded(zAdType = TrueAdsType.Z_ADMOB)
                                     zCallBackCalled = true
                                 }
 
                                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+
                                     zInterCallbacksInAdvance?.zOnAdFailedToLoad(
                                         zAdType = TrueAdsType.Z_ADMOB,
                                         zError = TrueError(
@@ -284,7 +329,9 @@ class TrueAdMobManager(
         }
     }
 
-    fun zShowInterstitialAdInAdvance(context: Activity) {
+    fun zShowInterstitialAdInAdvance(
+        context: Activity,
+    ) {
         dialog = Dialog(context)
         loadAds(context)
         if (zInterstitialAdInAdvance == null) {
@@ -802,6 +849,7 @@ class TrueAdMobManager(
 
     fun zSetInterCallbacks(interCallbacks: TrueInterCallbacks) {
         zInterCallbacks = interCallbacks
+        Log.d(TAG, "zSetInterCallbacks: ${zInterCallbacks}")
     }
 
     fun zSetNativeCallbacks(adCallbacks: TrueAdCallbacks) {
@@ -847,7 +895,7 @@ class TrueAdMobManager(
             WindowManager.LayoutParams.MATCH_PARENT
         )
         loadAdsLayoutBinding.tvMessage.text =
-            TrueAdManager.context.resources.getString(R.string.loading_ad)
+            TrueTrueAdManager.context.resources.getString(R.string.loading_ad)
     }
 
     /**Load And Show Native In Advance*/
@@ -937,6 +985,8 @@ class TrueAdMobManager(
                     admobNativeAdLoader!!.loadAd(AdRequest.Builder().build())
                 }, TruePrefUtils.getInstance().init(context, prefNameNative).delayMs
             )
+        } else {
+            nativeAdvanceBooleanValue = true
         }
     }
 
@@ -968,6 +1018,9 @@ class TrueAdMobManager(
         zNativeAdvancedView: TrueZNativeAdvancedView,
     ) {
         if (admobNativeAdLoader != null && !admobNativeAdLoader!!.isLoading) {
+            if (nativeAdvanceBooleanValue) {
+                zNativeAdvancedView.visibility = View.GONE
+            }
             if (mAdmobNative != null) {
                 inflateAdNativeAdInAdvance(context, mAdmobNative!!, zNativeAdvancedView)
             }
@@ -1065,6 +1118,8 @@ class TrueAdMobManager(
                 TruePrefUtils.getInstance()
                     .init(context, prefNameFlippingNativeInAdvanced).delayMs
             )
+        } else {
+            floatingNativeBooleanValue = true
         }
     }
 
@@ -1092,17 +1147,20 @@ class TrueAdMobManager(
     fun showAdmobFlippingNativeInAdvance(
         context: Activity,
         nativeAdId: String,
-        trueZNativeBannerSimpleView: TrueZNativeBannerFlippingView,
+        trueZNativeBannerFlippingView: TrueZNativeBannerFlippingView,
     ) {
         if (mFlippingAdmobNativeAdLoader != null && !mFlippingAdmobNativeAdLoader!!.isLoading) {
+            if (floatingNativeBooleanValue) {
+                trueZNativeBannerFlippingView.visibility = View.GONE
+            }
             if (mFlippingAdmobNative != null) {
                 inflateFlippingNativeAdInAdvance(
                     mFlippingAdmobNative!!,
-                    trueZNativeBannerSimpleView
+                    trueZNativeBannerFlippingView
                 )
             }
         } else {
-            trueZNativeBannerSimpleView.visibility = View.GONE
+            trueZNativeBannerFlippingView.visibility = View.GONE
         }
     }
 
@@ -1194,6 +1252,8 @@ class TrueAdMobManager(
                 TruePrefUtils.getInstance()
                     .init(context, prefNameSimpleNativeInAdvanced).delayMs
             )
+        } else {
+            simpleNativeBooleanValue = true
         }
     }
 
@@ -1224,6 +1284,9 @@ class TrueAdMobManager(
         trueZNativeBannerSimpleView: TrueZNativeBannerSimpleView,
     ) {
         if (mSimpleAdmobNativeAdLoader != null && !mSimpleAdmobNativeAdLoader!!.isLoading) {
+            if (simpleNativeBooleanValue) {
+                trueZNativeBannerSimpleView.visibility = View.GONE
+            }
             if (mSimpleAdmobNative != null) {
                 inflateSimpleNativeAdInAdvance(
                     mSimpleAdmobNative!!,

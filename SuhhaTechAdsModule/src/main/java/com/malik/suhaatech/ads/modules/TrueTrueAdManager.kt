@@ -3,6 +3,7 @@ package com.malik.suhaatech.ads.modules
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.malik.suhaatech.ads.modules.callbacks.TrueAdCallbacks
@@ -12,13 +13,14 @@ import com.malik.suhaatech.ads.modules.customadview.TrueZNativeAdvancedView
 import com.malik.suhaatech.ads.modules.customadview.TrueZNativeBannerFlippingView
 import com.malik.suhaatech.ads.modules.customadview.TrueZNativeBannerSimpleView
 import com.malik.suhaatech.ads.modules.fallbackstrategies.TrueAdMobFallbackTrueStrategy
+import com.malik.suhaatech.ads.modules.interfaces.TrueAdCallBackInterface
 import com.malik.suhaatech.ads.modules.types.TrueAdPriorityType
 import com.malik.suhaatech.ads.modules.types.TrueAdPriorityType.*
 import com.malik.suhaatech.ads.modules.types.TrueAdsType
 import com.malik.suhaatech.ads.modules.types.TrueWhatAd
 
 @SuppressLint("StaticFieldLeak")
-object TrueAdManager {
+object TrueTrueAdManager : TrueAdCallBackInterface {
 
     private var zAdMobManager: TrueAdMobManager? = null
     private var TAG = "AdManagerClass"
@@ -49,7 +51,7 @@ object TrueAdManager {
         interAdId: String,
         interCallbacks: TrueInterCallbacks
     ) {
-
+        Log.d(TAG, "zhSetInterCallbacks: ${interCallbacks}")
         interstitialAdId = interAdId
         zAdManagerInterCallbacks = interCallbacks
     }
@@ -67,7 +69,8 @@ object TrueAdManager {
             when (zPriorityType) {
                 Z_AD_MOB -> {
                     zAdMobManager?.zLoadInterstitialAd(
-                        activity, interstitialAdId!!
+                        activity, interstitialAdId!!,
+                        this
                     )
                 }
                 Z_NONE -> Unit
@@ -78,7 +81,8 @@ object TrueAdManager {
     fun zShowInterstitial(
         activity: Activity,
         interNewAdID: String,
-        priority: TrueAdPriorityType = zInterstitialPriorityType
+        trueAdCallBackInterface: TrueAdCallBackInterface,
+        priority: TrueAdPriorityType = zInterstitialPriorityType,
     ) {
         if (TrueConstants.isNetworkSpeedHigh()) {
             when (priority) {
@@ -88,7 +92,8 @@ object TrueAdManager {
                         return
                     } else {
                         zAdMobManager?.zLoadInterstitialAd(
-                            activity, interNewAdID
+                            activity, interNewAdID,
+                            trueAdCallBackInterface
                         )
                     }
                 }
@@ -243,7 +248,6 @@ object TrueAdManager {
         } else {
             zNativeAdvancedView.visibility = View.GONE
         }
-
     }
 
     /**Load Flipping Ad In Advance*/
@@ -380,7 +384,9 @@ object TrueAdManager {
     }
 
     /**Show Interstitial Ad In Advance*/
-    fun zShowInterstitialInAdvance(context: Activity) {
+    fun zShowInterstitialInAdvance(
+        context: Activity
+    ) {
         if (TrueConstants.isNetworkSpeedHigh()) {
             zAdMobManager?.zShowInterstitialAdInAdvance(
                 context
@@ -441,6 +447,7 @@ object TrueAdManager {
 
         override fun zOnAddLoaded(zAdType: TrueAdsType) {
             zAdManagerInterCallbacks?.zOnAddLoaded(zAdType)
+            Log.d(TAG, "zOnAddLoaded: 1")
         }
 
         override fun zOnAdFailedToShowFullContent(
@@ -456,6 +463,7 @@ object TrueAdManager {
 
         override fun zOnAddDismissed(zAdType: TrueAdsType) {
             zAdManagerInterCallbacks?.zOnAddDismissed(zAdType)
+            Log.d(TAG, "zOnAddDismissed: 2")
         }
 
         override fun zOnAdTimedOut(zAdType: TrueAdsType) {
@@ -543,13 +551,7 @@ object TrueAdManager {
                         ),
                         nativeAdvanceAdId = nativeAdvanceAdId!!
                     )
-                    /*TrueWhatAd.Z_BANNER -> zShowBanner(
-                        zBannerView = zNativeView as TrueZBannerView,
-                        "ca-app-pub-3940256099942544/6300978111",
-                        zPriorityType = zGetFallbackPriorityForBanner(
-                            zAdsType = zAdType
-                        )
-                    )*/
+
                     TrueWhatAd.Z_INTER -> Unit
                     else -> {
                     }
@@ -568,5 +570,9 @@ object TrueAdManager {
                 zWhatAd = zWhatAd
             )
         }
+    }
+
+    override fun onShowAdComplete() {
+        Log.d(TAG, "onShowAdComplete: ")
     }
 }
