@@ -120,7 +120,6 @@ class TrueAdMobManager(
                             adRequest,
                             object : InterstitialAdLoadCallback() {
                                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                                    dialog.dismiss()
                                     this@TrueAdMobManager.zInterstitialAd = interstitialAd
                                     TrueZSPRepository.setAdAvailableValue(context, true)
                                     interstitialAd.fullScreenContentCallback =
@@ -180,6 +179,9 @@ class TrueAdMobManager(
                                     zInterCallbacks?.zOnAddLoaded(zAdType = TrueAdsType.Z_ADMOB)
                                     zCallBackCalled = true
                                     interstitialAd.show(context)
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        dialog.dismiss()
+                                    }, 1000)
                                 }
 
                                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
