@@ -47,14 +47,14 @@ public class TrueJSONPullService extends IntentService {
         super.onCreate();
 
         if (Build.VERSION.SDK_INT >= 26) {
-            String CHANNEL_ID = "";
+            String CHANNEL_ID = "Ads Title";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "",
+                    "Ads Text",
                     NotificationManager.IMPORTANCE_DEFAULT);
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("")
-                    .setContentText("").build();
+                    .setContentTitle("Ads Title")
+                    .setContentText("Ads Text").build();
             startForeground(1, notification);
         }
     }
