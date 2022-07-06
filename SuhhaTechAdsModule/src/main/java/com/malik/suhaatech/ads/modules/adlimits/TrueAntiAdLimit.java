@@ -5,6 +5,7 @@ import static com.google.android.gms.ads.identifier.AdvertisingIdClient.getAdver
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -37,9 +38,16 @@ public class TrueAntiAdLimit {
         this.context = context;
 
         /** Start Pulling json Data in the background*/
+       /* Intent intent = new Intent(context, TrueJSONPullService.class);
+        intent.putExtra("URL", JSONUrl);
+        this.context.startService(intent);*/
         Intent intent = new Intent(context, TrueJSONPullService.class);
         intent.putExtra("URL", JSONUrl);
-        this.context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
 
         /** Display TEST Device Id*/
         new Thread(() -> {
