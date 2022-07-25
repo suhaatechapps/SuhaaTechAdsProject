@@ -193,7 +193,7 @@ class TrueAdMobManager(
                                             zDomain = loadAdError.domain,
                                         )
                                     )
-                                    TrueZSPRepository.setAdAvailableValue(context, true)
+                                    TrueZSPRepository.setAdAvailableValue(context, false)
                                     dialog.dismiss()
                                     zCallBackCalled = true
                                 }
